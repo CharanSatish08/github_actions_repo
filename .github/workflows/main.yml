@@ -60,9 +60,9 @@ jobs:
 
             
             - name: Set up Trivy
-              uses: aquasecurity/setup-trivy@v0.2.2   # pin a version
+              uses: aquasecurity/setup-trivy@v0.69.3   # pin a version
               with:
-                version: '0.65.0'
+                version: '0.69.3'
 
             - name: Verify Trivy
               run: trivy --version
