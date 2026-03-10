@@ -3,7 +3,11 @@ on:
   push:
     branches:
         - main
-  Workflow_dispatch:
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
     build:
@@ -11,9 +15,22 @@ jobs:
         steps:
             - name: code checkout
               uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
 
             - name: build
               run: mvn install
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: vprofile-app
+                path: target/*.war
+            
+            - name: Notify if build fails
+              if: failure()
+              run: echo "Build failed! Please check the logs for details."
+    
     
     test:
         runs-on: ubuntu-latest
@@ -22,8 +39,15 @@ jobs:
             - name: code checkout
               uses: actions/checkout@v4
             
-            - name: Test
+            - name: Run Tests on main branch
+              if: github.ref == 'refs/heads/main'
               run: mvn test
+
             - name: Checkstyle
+              if: github.ref == 'refs/heads/main'
               run: mvn checkstyle:checkstyle
+
+            - name: skip tests on other branches
+              if: github.ref != 'refs/heads/main'
+              run: echo "Tests are skipped for non-main branches."
 
