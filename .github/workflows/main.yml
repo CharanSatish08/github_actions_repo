@@ -58,15 +58,17 @@ jobs:
             - name: code checkout
               uses: actions/checkout@v4
 
-            - name: Run Trivy vulnerability scanner in fs mode
-              uses: aquasecurity/trivy-action@0.28.0
+            
+            - name: Set up Trivy
+              uses: aquasecurity/setup-trivy@v0.2.2   # pin a version
               with:
-                scan-type: fs
-                scan-ref: .
-                format: json
-                exit-code: 0
-                vuln-type: os,library
-                output: trivy-results.json
+                version: '0.65.0'
+
+            - name: Verify Trivy
+              run: trivy --version
+
+            - name: Scan filesystem
+              run: trivy fs --exit-code 0 --format json --vuln-type os,library --output trivy-results.json .
 
             - name: Upload Trivy scan results as artifact
               uses: actions/upload-artifact@v4
